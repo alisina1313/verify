@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Age check</title>
+<style>
+:root{--bg:#0d0d0d;--panel:#1a1a1a;--line:#2e2e2e;--ink:#e6e6e6;--muted:#8c8c8c;--orange:#ff6a00;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;display:flex;align-items:center;justify-content:center;padding:20px;overflow-x:hidden}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:28px;padding:36px 26px;max-width:400px;width:100%;text-align:center}
+.screen{display:none}
+.screen.active{display:block;animation:in .3s ease}
+@keyframes in{from{opacity:0}to{opacity:1}}
+.bar{width:48px;height:6px;border-radius:999px;background:var(--orange);margin:0 auto 26px}
+h1{font-size:1.7rem;line-height:1.2;margin:0 0 12px;font-weight:700;letter-spacing:-.01em}
+p{font-size:1.05rem;line-height:1.5;margin:0 0 26px;color:var(--muted)}
+button{font:inherit;font-weight:600;font-size:1.05rem;border:0;border-radius:999px;padding:15px 24px;cursor:pointer;width:100%;margin-top:10px;background:var(--orange);color:#0d0d0d;transition:transform .15s,opacity .15s}
+button:hover{opacity:.9}
+button:active{transform:scale(.97)}
+button.alt{background:#2a2a2a;color:var(--ink)}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+#prize{opacity:0;transform:scale(.8);transition:opacity 4.5s ease-in-out,transform 4.5s ease-in-out;margin-top:8px}
+#prize.show{opacity:1;transform:scale(1)}
+#prize .pine{font-size:6.5rem;line-height:1;margin-bottom:12px}
+#prize h1{font-size:1.3rem;margin:0}
+.hide{display:none}
+#rain{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.card{position:relative;z-index:1}
+.drop{position:absolute;top:-60px;animation:fall linear forwards;will-change:transform}
+@keyframes fall{to{transform:translateY(115vh) rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.screen.active{animation:none}#prize{transition-duration:.4s}}
+</style>
+</head>
+<body>
+<main class="card">
+
+<section class="screen active" id="s1">
+  <div class="bar"></div>
+  <h1>Age check</h1>
+  <p>Are you 18 years old?</p>
+  <button onclick="go('s3')">I'm 18, enter</button>
+  <button class="alt" onclick="go('s2')">I'm not 18</button>
+</section>
+
+<section class="screen" id="s2">
+  <div class="bar"></div>
+  <h1>Go back to your safety</h1>
+  <p>You can't enter.</p>
+  <button onclick="go('s1')">Back</button>
+</section>
+
+<section class="screen" id="s3">
+  <div class="bar"></div>
+  <h1>Congratulations</h1>
+  <p>You finally don't lie anymore.</p>
+  <button onclick="go('s4')">Next</button>
+</section>
+
+<section class="screen" id="s4">
+  <div class="bar"></div>
+  <h1 id="t4">Happy 18th Birthday</h1>
+  <p id="p4">Welcome to adulthood.</p>
+  <div id="prize" aria-live="polite">
+    <div class="pine">🍍</div>
+    <h1>Here's your 18th birthday prize</h1>
+  </div>
+  <button id="cta" onclick="reveal()">Click here to get your prize</button>
+</section>
+
+</main>
+<div id="rain" aria-hidden="true"></div>
+<script>
+function go(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+  document.getElementById(id).classList.add('active');
+  if(id==='s4')rain();
+}
+function rain(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  var box=document.getElementById('rain'),icons=['🎂','🎈','🎉','🎁','🍰','🎊','🥳'],n=0;
+  function drop(){
+    var d=document.createElement('span');
+    d.className='drop';
+    d.textContent=icons[Math.floor(Math.random()*icons.length)];
+    d.style.left=(Math.random()*95)+'%';
+    d.style.fontSize=(22+Math.random()*26)+'px';
+    var t=4+Math.random()*3;
+    d.style.animationDuration=t+'s';
+    d.addEventListener('animationend',function(){d.remove()});
+    box.appendChild(d);
+  }
+  for(var i=0;i<12;i++)setTimeout(drop,i*120);
+  var iv=setInterval(function(){drop();if(++n>35)clearInterval(iv)},250);
+}
+function reveal(){
+  document.getElementById('cta').classList.add('hide');
+  document.getElementById('t4').classList.add('hide');
+  document.getElementById('p4').classList.add('hide');
+  var p=document.getElementById('prize');
+  p.getBoundingClientRect();
+  requestAnimationFrame(function(){p.classList.add('show')});
+}
+</script>
+</body>
+</html>
